@@ -84,7 +84,12 @@ static void url_decode(char *dst, const char *src) {
 // Returns the resolved path, or NULL if it was unable to find an icon. The
 // return value must be freed by the caller.
 static char *resolve_icon(struct mako_notification *notif) {
-	char *icon_name = notif->app_icon;
+	char *icon_name = notif->style.override_icon[0] != '\0'
+		? notif->style.override_icon
+		: notif->app_icon[0] == '\0'
+			? notif->style.default_icon
+			:  notif->app_icon;
+
 	if (icon_name[0] == '\0') {
 		return NULL;
 	}

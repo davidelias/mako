@@ -94,6 +94,8 @@ void init_default_style(struct mako_style *style) {
 #endif
 	style->max_icon_size = 64;
 	style->icon_path = strdup("");  // hicolor and pixmaps are implicit.
+	style->override_icon = strdup("");
+	style->default_icon = strdup("");
 
 	style->font = strdup("monospace 10");
 	style->markup = true;
@@ -131,6 +133,8 @@ void init_empty_style(struct mako_style *style) {
 
 void finish_style(struct mako_style *style) {
 	free(style->icon_path);
+	free(style->override_icon);
+	free(style->default_icon);
 	free(style->font);
 	free(style->format);
 	free(style->output);
@@ -144,6 +148,8 @@ bool apply_style(struct mako_style *target, const struct mako_style *style) {
 	char *new_font = NULL;
 	char *new_format = NULL;
 	char *new_icon_path = NULL;
+	char *new_override_icon = NULL;
+	char *new_default_icon = NULL;
 	char *new_output = NULL;
 
 	if (style->spec.font) {
@@ -173,12 +179,37 @@ bool apply_style(struct mako_style *target, const struct mako_style *style) {
 		}
 	}
 
+	if (style->spec.override_icon) {
+		new_override_icon = strdup(style->override_icon);
+		if (new_override_icon == NULL) {
+			free(new_format);
+			free(new_font);
+			free(new_icon_path);
+			fprintf(stderr, "allocation failed\n");
+			return false;
+		}
+	}
+
+	if (style->spec.default_icon) {
+		new_default_icon = strdup(style->default_icon);
+		if (new_default_icon == NULL) {
+			free(new_format);
+			free(new_font);
+			free(new_icon_path);
+			free(new_override_icon);
+			fprintf(stderr, "allocation failed\n");
+			return false;
+		}
+	}
+
 	if (style->spec.output) {
 		new_output = strdup(style->output);
 		if (new_output == NULL) {
 			free(new_format);
 			free(new_font);
 			free(new_icon_path);
+			free(new_override_icon);
+			free(new_default_icon);
 			fprintf(stderr, "allocation failed\n");
 			return false;
 		}
@@ -225,6 +256,18 @@ bool apply_style(struct mako_style *target, const struct mako_style *style) {
 		free(target->icon_path);
 		target->icon_path = new_icon_path;
 		target->spec.icon_path = true;
+	}
+
+	if (style->spec.override_icon) {
+		free(target->override_icon);
+		target->override_icon = new_override_icon;
+		target->spec.override_icon = true;
+	}
+
+	if (style->spec.default_icon) {
+		free(target->default_icon);
+		target->default_icon = new_default_icon;
+		target->spec.default_icon = true;
 	}
 
 	if (style->spec.font) {
@@ -530,6 +573,12 @@ static bool apply_style_option(struct mako_style *style, const char *name,
 	} else if (strcmp(name, "icon-path") == 0) {
 		free(style->icon_path);
 		return spec->icon_path = !!(style->icon_path = strdup(value));
+	} else if (strcmp(name, "override-icon") == 0) {
+		free(style->override_icon);
+		return spec->override_icon = !!(style->override_icon = strdup(value));
+	} else if (strcmp(name, "default-icon") == 0) {
+		free(style->default_icon);
+		return spec->default_icon = !!(style->default_icon = strdup(value));
 	} else if (strcmp(name, "markup") == 0) {
 		return spec->markup = parse_boolean(value, &style->markup);
 	} else if (strcmp(name, "actions") == 0) {
@@ -769,6 +818,8 @@ int parse_config_arguments(struct mako_config *config, int argc, char **argv) {
 		{"icons", required_argument, 0, 0},
 		{"icon-location", required_argument, 0, 0},
 		{"icon-path", required_argument, 0, 0},
+		{"override-icon", required_argument, 0, 0},
+		{"default-icon", required_argument, 0, 0},
 		{"max-icon-size", required_argument, 0, 0},
 		{"markup", required_argument, 0, 0},
 		{"actions", required_argument, 0, 0},

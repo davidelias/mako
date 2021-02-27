@@ -139,6 +139,18 @@ _none_, _dismiss_, _dismiss-all_, _dismiss-group_, _invoke-default-action_,
 
 	Default: ""
 
+*override-icon*=_path_
+	Icon path to override notification's icon. Can be a Freedesktop icon
+	name, a file:// URI or an absolute path.
+
+	Default: ""
+
+*default-icon*=_path_
+	Icon path to set icon if notification doesn't have one. Can be a Freedesktop
+	icon name, a file:// URI or an absolute path.
+
+	Default: ""
+
 *icon-location*=_position_
 	Position of the icon relative to the displayed text. Valid options are
 	_left_, _right_, _top_ and _bottom_.
