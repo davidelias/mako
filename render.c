@@ -280,11 +280,11 @@ static int render_notification(cairo_t *cairo, struct mako_state *state, struct 
 			break;
 		case MAKO_ICON_LOCATION_TOP:
 			xpos = xpos_center;
-			ypos = offset_y + style->border_size;
+			ypos = offset_y + style->border_size + style->padding.top;
 			break;
 		case MAKO_ICON_LOCATION_BOTTOM:
 			xpos = xpos_center;
-			ypos = offset_y + text_y + text_height + style->margin.bottom;
+			ypos = offset_y + text_y + text_height + style->padding.bottom;
 			break;
 		}
 		draw_icon(cairo, icon, xpos, ypos, scale);
